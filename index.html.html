@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login Form Animation</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #12121e; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; }
+
+.scene {
+  width: 520px;
+  height: 460px;
+  background: #12121e;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.8s ease;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.scene.lit { background: #1a1508; }
+
+.title-bar {
+  width: 100%;
+  padding: 14px 20px;
+  color: rgba(255,255,255,0.85);
+  font-size: 15px;
+  font-weight: 500;
+  border-bottom: 0.5px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+
+.main-area {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  position: relative;
+}
+
+.lamp-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 60px;
+  margin-top: 36px;
+  position: relative;
+  z-index: 5;
+  flex-shrink: 0;
+}
+.ceiling-wire { width: 2px; height: 28px; background: #555; border-radius: 1px; }
+.lamp-shade {
+  width: 88px; height: 48px;
+  background: radial-gradient(ellipse at 50% 20%, #d4c8a0, #b8a840 60%, #8a7a25);
+  border-radius: 50% 50% 55% 55%;
+  box-shadow: 0 2px 0 #7a6a18;
+  transition: box-shadow 0.6s;
+}
+.lamp-shade.lit { box-shadow: 0 2px 0 #7a6a18, 0 0 50px 14px rgba(255,220,90,0.5); }
+.lamp-stem { width: 8px; height: 14px; background: #999; border-radius: 2px; }
+.lamp-base { width: 48px; height: 10px; background: #888; border-radius: 5px; }
+
+.cord-container {
+  display: flex; flex-direction: column; align-items: center;
+  margin-top: 4px; cursor: pointer; user-select: none;
+}
+.cord { width: 2px; height: 36px; background: linear-gradient(to bottom, #aaa, #888); border-radius: 1px; transition: height 0.15s ease; }
+.cord-ball {
+  width: 14px; height: 14px;
+  background: radial-gradient(circle at 35% 35%, #f0b030, #c07010);
+  border-radius: 50%; border: 1px solid #a06010;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  transition: transform 0.15s ease;
+}
+.cord-container:hover .cord-ball { transform: scale(1.12); }
+.cord-container.pulling .cord { height: 52px; }
+.cord-container.pulling .cord-ball { transform: translateY(6px) scale(0.93); }
+
+.hint { font-size: 11px; color: rgba(255,255,255,0.28); margin-top: 9px; letter-spacing: 0.3px; transition: opacity 0.4s; white-space: nowrap; }
+.hint.hidden { opacity: 0; }
+
+.lamp-glow {
+  position: absolute; top: 36px; left: 10px;
+  width: 260px; height: 220px;
+  background: radial-gradient(ellipse at 40% 30%, rgba(255,220,80,0.2) 0%, transparent 70%);
+  pointer-events: none; opacity: 0; transition: opacity 0.8s ease; z-index: 0;
+}
+.lamp-glow.visible { opacity: 1; }
+
+.login-card {
+  position: absolute; right: -320px; top: 50%; transform: translateY(-50%);
+  width: 260px;
+  background: rgba(20,16,6,0.97);
+  border: 1px solid rgba(200,160,60,0.22);
+  border-radius: 14px; padding: 24px 20px 20px; z-index: 10;
+  transition: right 0.55s cubic-bezier(0.34,1.2,0.64,1);
+  backdrop-filter: blur(8px);
+}
+.login-card.visible { right: 24px; }
+.login-card h2 { color: #e8d090; font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 18px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 10px; color: rgba(255,255,255,0.38); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.field input {
+  width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px; padding: 8px 11px; color: #fff; font-size: 13px;
+  outline: none; transition: border-color 0.2s; font-family: inherit;
+}
+.field input::placeholder { color: rgba(255,255,255,0.2); }
+.field input:focus { border-color: rgba(200,160,60,0.55); }
+
+.btn-login {
+  width: 100%; padding: 10px; border-radius: 7px; border: none;
+  background: linear-gradient(135deg, #c8a040, #e8c860);
+  color: #1a1000; font-size: 13px; font-weight: 600; cursor: pointer;
+  margin-top: 4px; transition: opacity 0.2s, transform 0.1s; font-family: inherit;
+  position: relative; overflow: hidden;
+}
+.btn-login:hover { opacity: 0.9; }
+.btn-login:active { transform: scale(0.98); }
+.btn-login.loading::after {
+  content: ''; position: absolute; left: -100%; top: 0; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shimmer 0.8s ease forwards;
+}
+@keyframes shimmer { to { left: 160%; } }
+.msg { font-size: 11px; text-align: center; margin-top: 9px; min-height: 15px; }
+.msg.error { color: #f07070; }
+.msg.success { color: #7fd88b; }
+</style>
+</head>
+<body>
+<div class="scene" id="scene">
+  <div class="title-bar">Login Form Animation</div>
+  <div class="main-area">
+    <div class="lamp-glow" id="lampGlow"></div>
+    <div class="lamp-area">
+      <div class="ceiling-wire"></div>
+      <div class="lamp-shade" id="lampShade"></div>
+      <div class="lamp-stem"></div>
+      <div class="lamp-base"></div>
+      <div class="cord-container" id="cord" onclick="pullCord()">
+        <div class="cord"></div>
+        <div class="cord-ball"></div>
+      </div>
+      <p class="hint" id="hint">اسحب الخيط</p>
+    </div>
+    <div class="login-card" id="loginCard">
+      <h2>Welcome back</h2>
+      <div class="field">
+        <label>Username</label>
+        <input type="text" id="uname" placeholder="Enter your name" autocomplete="off"/>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="upass" placeholder="••••••••" autocomplete="off"/>
+      </div>
+      <button class="btn-login" id="loginBtn" onclick="doLogin()">Log in</button>
+      <p class="msg" id="msg"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+let isOn = false, pulling = false;
+function pullCord() {
+  if (pulling) return;
+  pulling = true;
+  const cord = document.getElementById('cord');
+  cord.classList.add('pulling');
+  setTimeout(() => { cord.classList.remove('pulling'); pulling = false; toggleLamp(); }, 180);
+}
+function toggleLamp() {
+  isOn = !isOn;
+  const shade = document.getElementById('lampShade');
+  const glow = document.getElementById('lampGlow');
+  const scene = document.getElementById('scene');
+  const card = document.getElementById('loginCard');
+  const hint = document.getElementById('hint');
+  if (isOn) {
+    shade.classList.add('lit'); glow.classList.add('visible');
+    scene.classList.add('lit'); hint.classList.add('hidden');
+    setTimeout(() => card.classList.add('visible'), 280);
+  } else {
+    shade.classList.remove('lit'); glow.classList.remove('visible');
+    scene.classList.remove('lit'); card.classList.remove('visible'); hint.classList.remove('hidden');
+    document.getElementById('msg').textContent = '';
+    document.getElementById('msg').className = 'msg';
+    document.getElementById('loginBtn').textContent = 'Log in';
+    document.getElementById('loginBtn').disabled = false;
+  }
+}
+function doLogin() {
+  const user = document.getElementById('uname').value.trim();
+  const pw = document.getElementById('upass').value;
+  const btn = document.getElementById('loginBtn');
+  const msg = document.getElementById('msg');
+  msg.className = 'msg'; msg.textContent = '';
+  if (!user || !pw) { msg.className = 'msg error'; msg.textContent = 'Fill in all fields.'; return; }
+  btn.textContent = 'Logging in…'; btn.classList.add('loading'); btn.disabled = true;
+  setTimeout(() => {
+    btn.classList.remove('loading'); btn.disabled = false; btn.textContent = 'Log in';
+    msg.className = 'msg success'; msg.textContent = '✓ Welcome, ' + user + '!';
+  }, 900);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && isOn) doLogin(); });
+</script>
+</body>
+</html>
