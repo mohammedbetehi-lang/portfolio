@@ -5,137 +5,318 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Login Form Animation</title>
 <style>
+/* ─── Reset ─────────────────────────────────────────────── */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #12121e; min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: sans-serif; }
 
+/* ─── Body ───────────────────────────────────────────────── */
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  background: #0b0b16;
+}
+
+/* ─── Starfield inside scene ─────────────────────────────── */
+@keyframes drift1 {
+  0%   { transform: translate(0,   0); }
+  50%  { transform: translate(6px, -4px); }
+  100% { transform: translate(0,   0); }
+}
+@keyframes drift2 {
+  0%   { transform: translate(0,  0); }
+  50%  { transform: translate(-5px, 5px); }
+  100% { transform: translate(0,  0); }
+}
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.stars span {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+}
+/* layer A — slow */
+.stars .a { animation: drift1 8s ease-in-out infinite; }
+/* layer B — slightly faster */
+.stars .b { animation: drift2 6s ease-in-out infinite; }
+
+/* ─── Scene card ─────────────────────────────────────────── */
 .scene {
-  width: 520px;
-  height: 460px;
+  width: min(520px, 96vw);
+  height: clamp(380px, 60vh, 480px);
   background: #12121e;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   position: relative;
   overflow: hidden;
   transition: background 0.8s ease;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+  z-index: 1;
 }
 .scene.lit { background: #1a1508; }
 
+/* ─── Title bar ──────────────────────────────────────────── */
 .title-bar {
   width: 100%;
-  padding: 14px 20px;
+  padding: 13px 20px;
   color: rgba(255,255,255,0.85);
-  font-size: 15px;
+  font-size: clamp(13px, 2.5vw, 15px);
   font-weight: 500;
   border-bottom: 0.5px solid rgba(255,255,255,0.07);
   flex-shrink: 0;
 }
 
+/* ─── Main layout ────────────────────────────────────────── */
 .main-area {
   flex: 1;
   width: 100%;
   display: flex;
   align-items: flex-start;
   position: relative;
+  min-height: 0;
 }
 
+/* ─── Lamp ───────────────────────────────────────────────── */
 .lamp-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-left: 60px;
-  margin-top: 36px;
+  margin-left: clamp(24px, 8vw, 60px);
+  margin-top: clamp(24px, 5vh, 38px);
   position: relative;
   z-index: 5;
   flex-shrink: 0;
 }
 .ceiling-wire { width: 2px; height: 28px; background: #555; border-radius: 1px; }
+
 .lamp-shade {
-  width: 88px; height: 48px;
+  width: clamp(64px, 14vw, 88px);
+  height: clamp(34px, 8vw, 48px);
   background: radial-gradient(ellipse at 50% 20%, #d4c8a0, #b8a840 60%, #8a7a25);
   border-radius: 50% 50% 55% 55%;
   box-shadow: 0 2px 0 #7a6a18;
   transition: box-shadow 0.6s;
 }
-.lamp-shade.lit { box-shadow: 0 2px 0 #7a6a18, 0 0 50px 14px rgba(255,220,90,0.5); }
-.lamp-stem { width: 8px; height: 14px; background: #999; border-radius: 2px; }
-.lamp-base { width: 48px; height: 10px; background: #888; border-radius: 5px; }
-
-.cord-container {
-  display: flex; flex-direction: column; align-items: center;
-  margin-top: 4px; cursor: pointer; user-select: none;
+.lamp-shade.lit {
+  box-shadow: 0 2px 0 #7a6a18, 0 0 50px 14px rgba(255,220,90,0.5);
 }
-.cord { width: 2px; height: 36px; background: linear-gradient(to bottom, #aaa, #888); border-radius: 1px; transition: height 0.15s ease; }
+.lamp-stem { width: 8px; height: 14px; background: #999; border-radius: 2px; }
+.lamp-base { width: clamp(36px, 8vw, 48px); height: 10px; background: #888; border-radius: 5px; }
+
+/* ─── Pull cord ──────────────────────────────────────────── */
+.cord-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+.cord {
+  width: 2px;
+  height: 36px;
+  background: linear-gradient(to bottom, #aaa, #888);
+  border-radius: 1px;
+  transition: height 0.15s ease;
+}
 .cord-ball {
   width: 14px; height: 14px;
   background: radial-gradient(circle at 35% 35%, #f0b030, #c07010);
-  border-radius: 50%; border: 1px solid #a06010;
+  border-radius: 50%;
+  border: 1px solid #a06010;
   box-shadow: 0 1px 3px rgba(0,0,0,0.5);
   transition: transform 0.15s ease;
 }
 .cord-container:hover .cord-ball { transform: scale(1.12); }
-.cord-container.pulling .cord { height: 52px; }
+.cord-container.pulling .cord  { height: 52px; }
 .cord-container.pulling .cord-ball { transform: translateY(6px) scale(0.93); }
 
-.hint { font-size: 11px; color: rgba(255,255,255,0.28); margin-top: 9px; letter-spacing: 0.3px; transition: opacity 0.4s; white-space: nowrap; }
+.hint {
+  font-size: clamp(10px, 2vw, 11px);
+  color: rgba(255,255,255,0.28);
+  margin-top: 9px;
+  letter-spacing: 0.3px;
+  transition: opacity 0.4s;
+  white-space: nowrap;
+}
 .hint.hidden { opacity: 0; }
 
+/* ─── Glow under lamp ────────────────────────────────────── */
 .lamp-glow {
-  position: absolute; top: 36px; left: 10px;
+  position: absolute;
+  top: 36px; left: 10px;
   width: 260px; height: 220px;
   background: radial-gradient(ellipse at 40% 30%, rgba(255,220,80,0.2) 0%, transparent 70%);
-  pointer-events: none; opacity: 0; transition: opacity 0.8s ease; z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  z-index: 0;
 }
 .lamp-glow.visible { opacity: 1; }
 
+/* ─── Login card (slides in from right) ─────────────────── */
 .login-card {
-  position: absolute; right: -320px; top: 50%; transform: translateY(-50%);
-  width: 260px;
+  position: absolute;
+  right: -320px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(200px, 46vw, 260px);
   background: rgba(20,16,6,0.97);
   border: 1px solid rgba(200,160,60,0.22);
-  border-radius: 14px; padding: 24px 20px 20px; z-index: 10;
+  border-radius: 14px;
+  padding: clamp(16px, 3vw, 24px) clamp(14px, 3vw, 20px) clamp(14px, 2.5vw, 20px);
+  z-index: 10;
   transition: right 0.55s cubic-bezier(0.34,1.2,0.64,1);
   backdrop-filter: blur(8px);
 }
-.login-card.visible { right: 24px; }
-.login-card h2 { color: #e8d090; font-size: 16px; font-weight: 500; text-align: center; margin-bottom: 18px; }
-.field { margin-bottom: 12px; }
-.field label { display: block; font-size: 10px; color: rgba(255,255,255,0.38); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.login-card.visible { right: clamp(10px, 3vw, 24px); }
+
+.login-card h2 {
+  color: #e8d090;
+  font-size: clamp(14px, 2.8vw, 16px);
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* ─── Fields ─────────────────────────────────────────────── */
+.field { margin-bottom: 11px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 .field input {
-  width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 7px; padding: 8px 11px; color: #fff; font-size: 13px;
-  outline: none; transition: border-color 0.2s; font-family: inherit;
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 7px;
+  padding: 8px 11px;
+  color: #fff;
+  font-size: clamp(12px, 2.5vw, 13px);
+  outline: none;
+  /* smooth focus transition */
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  font-family: inherit;
 }
 .field input::placeholder { color: rgba(255,255,255,0.2); }
-.field input:focus { border-color: rgba(200,160,60,0.55); }
-
-.btn-login {
-  width: 100%; padding: 10px; border-radius: 7px; border: none;
-  background: linear-gradient(135deg, #c8a040, #e8c860);
-  color: #1a1000; font-size: 13px; font-weight: 600; cursor: pointer;
-  margin-top: 4px; transition: opacity 0.2s, transform 0.1s; font-family: inherit;
-  position: relative; overflow: hidden;
+.field input:focus {
+  border-color: rgba(200,160,60,0.7);
+  box-shadow: 0 0 0 3px rgba(200,160,60,0.12), 0 0 10px rgba(200,160,60,0.1);
+  background: rgba(255,255,255,0.09);
 }
-.btn-login:hover { opacity: 0.9; }
-.btn-login:active { transform: scale(0.98); }
+/* shake animation for validation error */
+.field input.shake {
+  animation: shake 0.35s ease;
+  border-color: rgba(240,112,112,0.7) !important;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-5px); }
+  40%      { transform: translateX(5px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+/* ─── Button ─────────────────────────────────────────────── */
+.btn-login {
+  width: 100%;
+  padding: 10px;
+  border-radius: 7px;
+  border: none;
+  background: linear-gradient(135deg, #c8a040, #e8c860);
+  color: #1a1000;
+  font-size: clamp(12px, 2.5vw, 13px);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+.btn-login:hover {
+  opacity: 0.92;
+  box-shadow: 0 4px 14px rgba(200,160,60,0.3);
+}
+.btn-login:active { transform: scale(0.97); }
 .btn-login.loading::after {
-  content: ''; position: absolute; left: -100%; top: 0; width: 60%; height: 100%;
+  content: '';
+  position: absolute;
+  left: -100%; top: 0; width: 60%; height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
   animation: shimmer 0.8s ease forwards;
 }
 @keyframes shimmer { to { left: 160%; } }
-.msg { font-size: 11px; text-align: center; margin-top: 9px; min-height: 15px; }
-.msg.error { color: #f07070; }
+
+/* ─── Message ────────────────────────────────────────────── */
+.msg {
+  font-size: 11px;
+  text-align: center;
+  margin-top: 9px;
+  min-height: 15px;
+  transition: opacity 0.3s;
+}
+.msg.error   { color: #f07070; }
 .msg.success { color: #7fd88b; }
+
+/* ─── Responsive — mobile ────────────────────────────────── */
+@media (max-width: 480px) {
+  .scene {
+    width: 98vw;
+    height: auto;
+    min-height: 380px;
+    border-radius: 10px;
+  }
+  .main-area {
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+  }
+  .lamp-area {
+    margin-left: 0;
+    margin-top: 24px;
+    align-self: center;
+  }
+  .login-card {
+    position: static;
+    transform: none;
+    right: auto !important;
+    width: calc(100% - 28px);
+    margin: 16px auto 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, margin-top 0.5s ease;
+  }
+  .login-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+    right: auto !important;
+  }
+  .lamp-glow {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
 </style>
 </head>
 <body>
 <div class="scene" id="scene">
+  <div class="stars" id="stars"></div>
   <div class="title-bar">Login Form Animation</div>
   <div class="main-area">
     <div class="lamp-glow" id="lampGlow"></div>
+
     <div class="lamp-area">
       <div class="ceiling-wire"></div>
       <div class="lamp-shade" id="lampShade"></div>
@@ -147,6 +328,7 @@ body { background: #12121e; min-height: 100vh; display: flex; align-items: cente
       </div>
       <p class="hint" id="hint">اسحب الخيط</p>
     </div>
+
     <div class="login-card" id="loginCard">
       <h2>Welcome back</h2>
       <div class="field">
@@ -164,7 +346,30 @@ body { background: #12121e; min-height: 100vh; display: flex; align-items: cente
 </div>
 
 <script>
+/* ── Generate stars ── */
+(function() {
+  const container = document.getElementById('stars');
+  const count = 38;
+  for (let i = 0; i < count; i++) {
+    const s = document.createElement('span');
+    const size = Math.random() * 1.8 + 0.6;  // 0.6–2.4 px
+    s.style.cssText = [
+      'width:'  + size + 'px',
+      'height:' + size + 'px',
+      'left:'   + (Math.random() * 100) + '%',
+      'top:'    + (Math.random() * 100) + '%',
+      'opacity:' + (Math.random() * 0.45 + 0.15),
+      'animation-duration:' + (Math.random() * 6 + 5) + 's',
+      'animation-delay:-'   + (Math.random() * 8)     + 's',
+    ].join(';');
+    s.className = Math.random() > 0.5 ? 'a' : 'b';
+    container.appendChild(s);
+  }
+})();
+
 let isOn = false, pulling = false;
+
+/* ── Pull cord ── */
 function pullCord() {
   if (pulling) return;
   pulling = true;
@@ -172,39 +377,88 @@ function pullCord() {
   cord.classList.add('pulling');
   setTimeout(() => { cord.classList.remove('pulling'); pulling = false; toggleLamp(); }, 180);
 }
+
+/* ── Toggle lamp + card ── */
 function toggleLamp() {
   isOn = !isOn;
   const shade = document.getElementById('lampShade');
-  const glow = document.getElementById('lampGlow');
+  const glow  = document.getElementById('lampGlow');
   const scene = document.getElementById('scene');
-  const card = document.getElementById('loginCard');
-  const hint = document.getElementById('hint');
+  const card  = document.getElementById('loginCard');
+  const hint  = document.getElementById('hint');
+
   if (isOn) {
-    shade.classList.add('lit'); glow.classList.add('visible');
-    scene.classList.add('lit'); hint.classList.add('hidden');
+    shade.classList.add('lit');
+    glow.classList.add('visible');
+    scene.classList.add('lit');
+    hint.classList.add('hidden');
     setTimeout(() => card.classList.add('visible'), 280);
   } else {
-    shade.classList.remove('lit'); glow.classList.remove('visible');
-    scene.classList.remove('lit'); card.classList.remove('visible'); hint.classList.remove('hidden');
-    document.getElementById('msg').textContent = '';
-    document.getElementById('msg').className = 'msg';
-    document.getElementById('loginBtn').textContent = 'Log in';
-    document.getElementById('loginBtn').disabled = false;
+    shade.classList.remove('lit');
+    glow.classList.remove('visible');
+    scene.classList.remove('lit');
+    card.classList.remove('visible');
+    hint.classList.remove('hidden');
+    resetForm();
   }
 }
-function doLogin() {
-  const user = document.getElementById('uname').value.trim();
-  const pw = document.getElementById('upass').value;
-  const btn = document.getElementById('loginBtn');
+
+/* ── Validation helpers ── */
+function shakeField(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth; // reflow to restart animation
+  el.classList.add('shake');
+  el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+}
+
+function setMsg(type, text) {
   const msg = document.getElementById('msg');
-  msg.className = 'msg'; msg.textContent = '';
-  if (!user || !pw) { msg.className = 'msg error'; msg.textContent = 'Fill in all fields.'; return; }
-  btn.textContent = 'Logging in…'; btn.classList.add('loading'); btn.disabled = true;
+  msg.className = 'msg ' + type;
+  msg.textContent = text;
+}
+
+function resetForm() {
+  document.getElementById('uname').value = '';
+  document.getElementById('upass').value = '';
+  setMsg('', '');
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Log in';
+  btn.disabled = false;
+  btn.classList.remove('loading');
+}
+
+/* ── Login ── */
+function doLogin() {
+  const unameEl = document.getElementById('uname');
+  const upassEl = document.getElementById('upass');
+  const btn     = document.getElementById('loginBtn');
+  const user    = unameEl.value.trim();
+  const pw      = upassEl.value.trim();
+
+  setMsg('', '');
+
+  // Validate — shake the offending field
+  if (!user && !pw) {
+    shakeField(unameEl); shakeField(upassEl);
+    setMsg('error', 'Please fill in all fields.');
+    return;
+  }
+  if (!user) { shakeField(unameEl); setMsg('error', 'Username is required.'); return; }
+  if (!pw)   { shakeField(upassEl); setMsg('error', 'Password is required.'); return; }
+
+  btn.textContent = 'Logging in…';
+  btn.classList.add('loading');
+  btn.disabled = true;
+
   setTimeout(() => {
-    btn.classList.remove('loading'); btn.disabled = false; btn.textContent = 'Log in';
-    msg.className = 'msg success'; msg.textContent = '✓ Welcome, ' + user + '!';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    btn.textContent = 'Log in';
+    setMsg('success', '✓ Welcome, ' + user + '!');
   }, 900);
 }
+
+/* ── Enter key support ── */
 document.addEventListener('keydown', e => { if (e.key === 'Enter' && isOn) doLogin(); });
 </script>
 </body>
